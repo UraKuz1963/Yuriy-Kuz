@@ -1,0 +1,4 @@
+aliexpress.ru:http
+golang.org:http
+etttt.ru:http
+gismeteo.ru:http
