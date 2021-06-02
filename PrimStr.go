@@ -15,7 +15,7 @@ func check(e error) {
 		panic(e)
 	}
 }
-func hostDial(host string, id int) bool {
+func hostDial(host string, id *int) {
 	port := "80"
 	timeout := time.Duration(4 * time.Second)
 	//_, err := net.Dial("tcp", host)
@@ -23,15 +23,17 @@ func hostDial(host string, id int) bool {
 	_, err := net.DialTimeout("tcp", host, timeout)
 	if err != nil {
 		fmt.Printf("%s %s %s\n", host, "not responding", err.Error())
-		return false
+		*id--
+		return
 	} else {
 		fmt.Printf("%s %s %s\n", host, "responding ....", port)
-		return true
+		*id--
+		return
 	}
 }
 
 func main() {
-
+	iRut := 0
 	f, err := os.Open("hello.txt")
 	check(err)
 	fmt.Println("Start:", "\n")
@@ -44,20 +46,18 @@ func main() {
 	check(err)
 	//fmt.Printf("%d bytes: %s\n", n1, string(b1[:n1]))
 	words := strings.Fields(string(b1[:n1]))
-	for idx, word := range words {
-		//timeout := time.Duration(4 * time.Second)
-		//_, err := net.Dial("tcp", host)
-		//_, err := net.DialTimeout("tcp", host+":"+port, timeout)
-		//_, err := net.DialTimeout("tcp", host, timeout)
-		go hostDial(word, idx)
-		//if hostDial(word, 4) == false {
-		//fmt.Printf("%s %s %s\n", host, "not responding", err.Error())
-		//} else {
-		//fmt.Printf("%s %s %s\n", host, "responding ....", port)
-		//}
+	for _, word := range words {
+		iRut++
+		go hostDial(word, &iRut)
+		for iRut > 3 {
+		}
 	}
-	var input string
-	fmt.Scanln(&input)                    // Для паузы перед выходом из программы
+	for iRut > 0 {
+	}
+	fmt.Println("End:", "\n")
+	//var input string
+	//fmt.Scanln(&input)                  // Для паузы перед выходом из программы
 	defer f.Close()                       // закрываем файл
 	fmt.Println(" Имя файла: ", f.Name()) // hello.txt
+	return
 }
