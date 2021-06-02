@@ -17,7 +17,7 @@ func check(e error) {
 }
 func hostDial(host string, id *int) {
 	port := "80"
-	timeout := time.Duration(4 * time.Second)
+	timeout := time.Duration(1 * time.Second)
 	//_, err := net.Dial("tcp", host)
 	//_, err := net.DialTimeout("tcp", host+":"+port, timeout)
 	_, err := net.DialTimeout("tcp", host, timeout)
@@ -49,14 +49,12 @@ func main() {
 	for _, word := range words {
 		iRut++
 		go hostDial(word, &iRut)
-		for iRut > 3 {
+		for iRut > 4 { // Пауза если процессов более 4
 		}
 	}
-	for iRut > 0 {
+	for iRut > 0 { // Ожидание окончания всех процессов
 	}
 	fmt.Println("End:", "\n")
-	//var input string
-	//fmt.Scanln(&input)                  // Для паузы перед выходом из программы
 	defer f.Close()                       // закрываем файл
 	fmt.Println(" Имя файла: ", f.Name()) // hello.txt
 	return
