@@ -1,13 +1,10 @@
-// Go program to illustrate how to
-// access the bytes of the string
 package main
 
 import (
 	"fmt"
-	"net"
+	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 func check(e error) {
@@ -15,21 +12,44 @@ func check(e error) {
 		panic(e)
 	}
 }
-func hostDial(host string, id *int) {
-	port := "80"
-	timeout := time.Duration(1 * time.Second)
-	//_, err := net.Dial("tcp", host)
-	//_, err := net.DialTimeout("tcp", host+":"+port, timeout)
-	_, err := net.DialTimeout("tcp", host, timeout)
-	if err != nil {
-		fmt.Printf("%s %s %s\n", host, "not responding", err.Error())
-		*id--
-		return
-	} else {
-		fmt.Printf("%s %s %s\n", host, "responding ....", port)
-		*id--
-		return
+func Contains(a string, x string) bool {
+	for isimv := 0; isimv < len(a); isimv++ {
+		for i := 0; i < len(x); i++ {
+			if x[i] != a[isimv+i] {
+				break
+			}
+			if i == len(x)-1 {
+				return true
+			}
+		}
 	}
+	return false
+}
+
+func seekinBody(host string, strFind string, id *int) bool {
+	resp, err := http.Get(host)
+	if err != nil {
+		fmt.Println(err)
+		*id--
+		return false
+	}
+	defer resp.Body.Close()
+	strBody := ""
+	for true {
+		bs := make([]byte, 32768)
+		n, err := resp.Body.Read(bs)
+		strBody += string(bs[:n])
+		if n == 0 || err != nil {
+			if Contains(strBody, strFind) == true {
+				fmt.Println("В хосте ", host, " найдена строка ", strFind, "\n")
+				*id--
+				return true
+			}
+			break
+		}
+	}
+	*id--
+	return false
 }
 
 func main() {
@@ -46,10 +66,14 @@ func main() {
 	check(err)
 	//fmt.Printf("%d bytes: %s\n", n1, string(b1[:n1]))
 	words := strings.Fields(string(b1[:n1]))
+	var input string
+	fmt.Println("\n", "Введите строку для поиска:")
+	fmt.Scanln(&input)
+	fmt.Println("\n", "Идет поиск:", "\n")
 	for _, word := range words {
 		iRut++
-		go hostDial(word, &iRut)
-		for iRut > 4 { // Пауза если процессов более 4
+		go seekinBody(word, input, &iRut)
+		for iRut > 20 { // Пауза если процессов более 4
 		}
 	}
 	for iRut > 0 { // Ожидание окончания всех процессов
