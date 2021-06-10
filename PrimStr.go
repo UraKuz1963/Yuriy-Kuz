@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func check(e error) {
@@ -26,11 +28,11 @@ func Contains(a string, x string) bool {
 	return false
 }
 
-func seekinBody(host string, strFind string, id *int) bool {
+func seekinBody(host string, strFind string, c chan string) bool {
 	resp, err := http.Get(host)
 	if err != nil {
 		fmt.Println(err)
-		*id--
+		<-c
 		return false
 	}
 	defer resp.Body.Close()
@@ -42,21 +44,23 @@ func seekinBody(host string, strFind string, id *int) bool {
 		if n == 0 || err != nil {
 			if Contains(strBody, strFind) == true {
 				fmt.Println("В хосте ", host, " найдена строка ", strFind, "\n")
-				*id--
+				<-c
 				return true
 			}
 			break
 		}
 	}
-	*id--
+	<-c
 	return false
 }
 
 func main() {
-	iRut := 0
+	numVorkers := flag.Int("numVorkers", 3, "an int")
+	flag.Parse()
+	//iRut := 0
 	f, err := os.Open("hello.txt")
 	check(err)
-	fmt.Println("Start:", "\n")
+	fmt.Println("Start: ", *numVorkers, "\n")
 	if err != nil { // если возникла ошибка
 		fmt.Println("Unable to open file:", err)
 		os.Exit(1) // выходим из программы
@@ -64,19 +68,24 @@ func main() {
 	b1 := make([]byte, 1024) //Предполагаем пока макс длинну файла 1024 байт
 	n1, err := f.Read(b1)
 	check(err)
-	//fmt.Printf("%d bytes: %s\n", n1, string(b1[:n1]))
 	words := strings.Fields(string(b1[:n1]))
 	var input string
 	fmt.Println("\n", "Введите строку для поиска:")
 	fmt.Scanln(&input)
 	fmt.Println("\n", "Идет поиск:", "\n")
+	iRut := make(chan string, *numVorkers)
 	for _, word := range words {
-		iRut++
-		go seekinBody(word, input, &iRut)
-		for iRut > 20 { // Пауза если процессов более 4
-		}
+		iRut <- "1"
+		go seekinBody(word, input, iRut)
 	}
-	for iRut > 0 { // Ожидание окончания всех процессов
+	iFlag := true
+	for iFlag {
+		select {
+		case <-iRut: // ожидание исчерпания буфера канала
+			time.Sleep(time.Millisecond * 10) // задержка 10мс
+		default:
+			iFlag = false
+		}
 	}
 	fmt.Println("End:", "\n")
 	defer f.Close()                       // закрываем файл
