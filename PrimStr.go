@@ -55,7 +55,7 @@ func seekinBody(host string, strFind string, c chan string) bool {
 }
 
 func main() {
-	numVorkers := flag.Int("numVorkers", 3, "an int")
+	numVorkers := flag.Int("numVorkers", 5, "an int")
 	flag.Parse()
 	//iRut := 0
 	f, err := os.Open("hello.txt")
@@ -75,14 +75,16 @@ func main() {
 	fmt.Println("\n", "Идет поиск:", "\n")
 	iRut := make(chan string, *numVorkers)
 	for _, word := range words {
-		iRut <- "1" // ставим флаг в канал о запущеной горутине
+		iRut <- "1" // ставим флаг в канал для запущеной горутине
 		go seekinBody(word, input, iRut)
 	}
 	iFlag := true
 	for iFlag {
 		select {
 		case <-iRut: // ожидание исчерпания буфера канала
-			time.Sleep(time.Millisecond * 10) // задержка 10мс
+			iRut <- "1"
+			time.Sleep(time.Millisecond * 100) // задержка 100мс
+			fmt.Println("+", "\n")
 		default:
 			iFlag = false
 		}
