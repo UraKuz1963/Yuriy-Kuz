@@ -1,0 +1,7 @@
+http://golang.org
+http://etttt.ru
+http://gismeteo.ru
+http://e1.ru
+http://mail.ru
+http://github.com
+http://geeksforgeeks.org
