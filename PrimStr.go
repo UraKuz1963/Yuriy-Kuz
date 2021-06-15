@@ -84,7 +84,7 @@ func main() {
 		case <-iRut: // ожидание исчерпания буфера канала
 			iRut <- "1"
 			time.Sleep(time.Millisecond * 100) // задержка 100мс
-			fmt.Println("+", "\n")
+			//fmt.Println("+", "\n")
 		default:
 			iFlag = false
 		}
