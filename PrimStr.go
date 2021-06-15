@@ -84,7 +84,7 @@ func main() {
 		case <-iRut: // ожидание исчерпания буфера канала
 			iRut <- "1"
 			time.Sleep(time.Millisecond * 100) // задержка 10мс
-			fmt.Println("++++", "\n")
+			//fmt.Println("++++", "\n")
 		default:
 			iFlag = false
 		}
@@ -94,4 +94,3 @@ func main() {
 	fmt.Println(" Имя файла: ", f.Name()) // hello.txt
 	return
 }
->>>>>>> eb1a8546d6419853aa5a2e14ed79911f895d203a
