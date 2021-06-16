@@ -30,6 +30,7 @@ func Contains(a string, x string) bool {
 
 func seekinBody(host string, strFind string, c chan string) bool {
 	resp, err := http.Get(host)
+	//defer resp.Body.Close()
 	if err != nil {
 		fmt.Println(err)
 		<-c

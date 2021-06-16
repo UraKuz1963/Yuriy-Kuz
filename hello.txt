@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 http://etttt.ru
 http://gismeteo.ru
 http://e1.ru
@@ -30,7 +29,6 @@ http://gismeteo.ru
 http://e1.ru
 http://mail.ru
 http://github.com
-=======
 http://etttt.ru
 http://gismeteo.ru
 http://e1.ru
@@ -62,5 +60,4 @@ http://gismeteo.ru
 http://e1.ru
 http://mail.ru
 http://github.com
->>>>>>> eb1a8546d6419853aa5a2e14ed79911f895d203a
 http://geeksforgeeks.or
